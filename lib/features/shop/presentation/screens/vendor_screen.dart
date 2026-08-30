@@ -29,133 +29,7 @@ class VendorScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                height: 275.h,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SizedBox(
-                      height: 225.h,
-                      width: double.infinity,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.asset(
-                            ImagePath.shopVendorCover,
-                            fit: BoxFit.cover,
-                          ),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  const Color(0xD12A060D),
-                                  const Color(0x000D050B),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
-                        child: Row(
-                          children: [
-                            _CircleBtn(icon: IconPath.shopBack, onTap: Get.back),
-                            const Spacer(),
-                            _CircleBtn(icon: IconPath.shopShare, onTap: () {}),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 16.w,
-                      top: 175.h,
-                      child: Container(
-                        width: 100.w,
-                        height: 100.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                          image: const DecorationImage(
-                            image: AssetImage(ImagePath.shopVendorAvatar),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 128.w,
-                      top: 237.h,
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 24.h,
-                            padding: EdgeInsets.symmetric(horizontal: 12.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.burgundy,
-                              borderRadius: BorderRadius.circular(43.r),
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  IconPath.shopTick,
-                                  width: 12.w,
-                                  height: 12.w,
-                                  colorFilter: const ColorFilter.mode(
-                                    AppColors.gold400,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                SizedBox(width: 3.w),
-                                Text(
-                                  'Licensed',
-                                  style: GoogleFonts.hankenGrotesk(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.gold400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Container(
-                            height: 24.h,
-                            padding: EdgeInsets.symmetric(horizontal: 12.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.gold50,
-                              borderRadius: BorderRadius.circular(43.r),
-                              border: Border.all(color: AppColors.burgundy100),
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  IconPath.shopSparkle,
-                                  width: 12.w,
-                                  height: 12.w,
-                                ),
-                                SizedBox(width: 3.w),
-                                Text(
-                                  'Featured Vendor',
-                                  style: GoogleFonts.hankenGrotesk(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.burgundy,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _VendorHeader(),
               Padding(
                 padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
                 child: Column(
@@ -197,12 +71,16 @@ class VendorScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 4.w),
-                          Text(
-                            'Omega Psi Phi',
-                            style: GoogleFonts.hankenGrotesk(
-                              fontSize: 12.sp,
-                              height: 1.4,
-                              color: AppColors.black400,
+                          Flexible(
+                            child: Text(
+                              'Omega Psi Phi',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.hankenGrotesk(
+                                fontSize: 12.sp,
+                                height: 1.4,
+                                color: AppColors.black400,
+                              ),
                             ),
                           ),
                         ],
@@ -215,6 +93,7 @@ class VendorScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
+                          flex: 3,
                           child: Column(
                             children: [
                               _Stat(
@@ -244,21 +123,24 @@ class VendorScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 12.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _Stat(
-                              icon: IconPath.shopBox,
-                              value: '42',
-                              label: 'Products',
-                            ),
-                            SizedBox(height: 8.h),
-                            _Stat(
-                              icon: IconPath.shopCalendar,
-                              value: '2024',
-                              label: 'Vendor Since',
-                            ),
-                          ],
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _Stat(
+                                icon: IconPath.shopBox,
+                                value: '42',
+                                label: 'Products',
+                              ),
+                              SizedBox(height: 8.h),
+                              _Stat(
+                                icon: IconPath.shopCalendar,
+                                value: '2024',
+                                label: 'Vendor Since',
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -303,8 +185,8 @@ class VendorScreen extends StatelessWidget {
                           children: [
                             SvgPicture.asset(
                               IconPath.shopMessage,
-                              width: 24.w,
-                              height: 24.w,
+                              width: 20.w,
+                              height: 20.w,
                             ),
                             SizedBox(width: 8.w),
                             Text(
@@ -312,6 +194,7 @@ class VendorScreen extends StatelessWidget {
                               style: GoogleFonts.hankenGrotesk(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
+                                height: 1.2,
                                 color: AppColors.vendorRose,
                               ),
                             ),
@@ -321,9 +204,10 @@ class VendorScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
                     Obx(
-                      () => SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
+                      () => SizedBox(
+                        height: 32.h,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
                           children: [
                             ShopChip(
                               label: 'All',
@@ -385,25 +269,30 @@ class VendorScreen extends StatelessWidget {
                                 ),
                               ),
                               const Spacer(),
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Short: ',
-                                      style: GoogleFonts.hankenGrotesk(
-                                        fontSize: 14.sp,
-                                        color: AppColors.black300,
+                              Flexible(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Short: ',
+                                        style: GoogleFonts.hankenGrotesk(
+                                          fontSize: 14.sp,
+                                          color: AppColors.black300,
+                                        ),
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Price Low to High',
-                                      style: GoogleFonts.hankenGrotesk(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textBody,
+                                      TextSpan(
+                                        text: 'Price Low to High',
+                                        style: GoogleFonts.hankenGrotesk(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.textBody,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.right,
                                 ),
                               ),
                               SizedBox(width: 8.w),
@@ -544,6 +433,149 @@ class VendorScreen extends StatelessWidget {
   }
 }
 
+class _VendorHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final avatarSize = 100.w;
+    final coverHeight = 225.h;
+    final headerHeight = coverHeight + avatarSize / 2;
+
+    return SizedBox(
+      height: headerHeight,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SizedBox(
+            height: coverHeight,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(ImagePath.shopVendorCover, fit: BoxFit.cover),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xD12A060D), Color(0x000D050B)],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
+              child: Row(
+                children: [
+                  _CircleBtn(icon: IconPath.shopBack, onTap: Get.back),
+                  const Spacer(),
+                  _CircleBtn(icon: IconPath.shopShare, onTap: () {}),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 16.w,
+            top: coverHeight - avatarSize / 2,
+            child: Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                image: const DecorationImage(
+                  image: AssetImage(ImagePath.shopVendorAvatar),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 16.w + avatarSize + 12.w,
+            right: 16.w,
+            bottom: 8.h,
+            child: Wrap(
+              spacing: 8.w,
+              runSpacing: 4.h,
+              children: [
+                _HeaderBadge(
+                  icon: IconPath.shopTick,
+                  label: 'Licensed',
+                  background: AppColors.burgundy,
+                  foreground: AppColors.gold400,
+                  iconColor: AppColors.gold400,
+                ),
+                _HeaderBadge(
+                  icon: IconPath.shopSparkle,
+                  label: 'Featured Vendor',
+                  background: AppColors.gold50,
+                  foreground: AppColors.burgundy,
+                  border: AppColors.burgundy100,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderBadge extends StatelessWidget {
+  const _HeaderBadge({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.foreground,
+    this.iconColor,
+    this.border,
+  });
+
+  final String icon;
+  final String label;
+  final Color background;
+  final Color foreground;
+  final Color? iconColor;
+  final Color? border;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(43.r),
+        border: border == null ? null : Border.all(color: border!),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(
+            icon,
+            width: 12.w,
+            height: 12.w,
+            colorFilter: iconColor == null
+                ? null
+                : ColorFilter.mode(iconColor!, BlendMode.srcIn),
+          ),
+          SizedBox(width: 3.w),
+          Text(
+            label,
+            style: GoogleFonts.hankenGrotesk(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              height: 1.2,
+              color: foreground,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CircleBtn extends StatelessWidget {
   const _CircleBtn({required this.icon, required this.onTap});
 
@@ -588,7 +620,7 @@ class _Stat extends StatelessWidget {
         SvgPicture.asset(icon, width: 16.w, height: 16.w),
         SizedBox(width: 8.w),
         Flexible(
-          child: Text.rich(
+                          child: Text.rich(
             TextSpan(
               children: [
                 TextSpan(
@@ -596,6 +628,7 @@ class _Stat extends StatelessWidget {
                   style: GoogleFonts.hankenGrotesk(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
+                    height: 1.3,
                     color: accent ? AppColors.maroonDark : AppColors.textBody,
                   ),
                 ),
@@ -604,12 +637,14 @@ class _Stat extends StatelessWidget {
                     text: ' $label',
                     style: GoogleFonts.hankenGrotesk(
                       fontSize: 12.sp,
-                      height: 1.4,
+                      height: 1.3,
                       color: AppColors.black400,
                     ),
                   ),
               ],
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

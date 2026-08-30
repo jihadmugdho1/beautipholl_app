@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 class ProductController extends GetxController {
   final isElite = false.obs;
   final productId = 'p1'.obs;
-  final selectedColor = 2.obs;
+  final selectedColor = 0.obs;
   final selectedSize = 'M'.obs;
   final quantity = 1.obs;
   final selectedThumb = 0.obs;
