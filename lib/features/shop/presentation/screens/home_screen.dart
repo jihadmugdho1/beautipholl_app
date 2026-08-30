@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -132,10 +134,84 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _HeroBanner extends StatelessWidget {
+class _HeroSlide {
+  const _HeroSlide({
+    required this.title,
+    required this.subtitle,
+    required this.image,
+  });
+
+  final String title;
+  final String subtitle;
+  final String image;
+}
+
+class _HeroBanner extends StatefulWidget {
   const _HeroBanner({required this.onShopNow});
 
   final VoidCallback onShopNow;
+
+  @override
+  State<_HeroBanner> createState() => _HeroBannerState();
+}
+
+class _HeroBannerState extends State<_HeroBanner> {
+  static const _slides = [
+    _HeroSlide(
+      title: 'Line Gifts & Fits',
+      subtitle: 'Up to 30% off • licensed vendors only',
+      image: ImagePath.shopHero,
+    ),
+    _HeroSlide(
+      title: 'Homecoming Drops',
+      subtitle: 'New licensed fits for the season',
+      image: ImagePath.shopProduct,
+    ),
+    _HeroSlide(
+      title: 'Crossing Essentials',
+      subtitle: 'Official line gifts from verified vendors',
+      image: ImagePath.shopProduct2,
+    ),
+    _HeroSlide(
+      title: 'Founders Day Fits',
+      subtitle: 'Celebrate with gold & purple staples',
+      image: ImagePath.shopProduct3,
+    ),
+    _HeroSlide(
+      title: 'Shop the Yard',
+      subtitle: 'Members save more on licensed apparel',
+      image: ImagePath.shopProductHero,
+    ),
+  ];
+
+  late final PageController _pageController;
+  Timer? _timer;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _startAutoPlay();
+  }
+
+  void _startAutoPlay() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,96 +225,121 @@ class _HeroBanner extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          Positioned(
-            right: -10.w,
-            bottom: 0,
-            child: Image.asset(
-              ImagePath.shopHero,
-              width: 166.w,
-              height: 133.h,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 16.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Line Gifts & Fits',
-                    style: GoogleFonts.marcellus(
-                      fontSize: 32.sp,
-                      height: 1.2,
-                      color: AppColors.gold200,
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _index = index % _slides.length);
+              _startAutoPlay();
+            },
+            itemBuilder: (context, index) {
+              final slide = _slides[index % _slides.length];
+              return Stack(
+                children: [
+                  Positioned(
+                    right: -10.w,
+                    bottom: 0,
+                    child: Image.asset(
+                      slide.image,
+                      width: 166.w,
+                      height: 133.h,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Up to 30% off • licensed vendors only',
-                  style: GoogleFonts.hankenGrotesk(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    color: AppColors.burgundy50,
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: onShopNow,
-                  child: Container(
-                    width: 118.w,
-                    height: 32.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.burgundy,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border(
-                        top: BorderSide(
-                          color: AppColors.burgundy100,
-                          width: 0.75,
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 16.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            slide.title,
+                            style: GoogleFonts.marcellus(
+                              fontSize: 32.sp,
+                              height: 1.2,
+                              color: AppColors.gold200,
+                            ),
+                          ),
                         ),
-                        left: BorderSide(
-                          color: AppColors.burgundy100,
-                          width: 0.75,
+                        SizedBox(height: 8.h),
+                        Text(
+                          slide.subtitle,
+                          style: GoogleFonts.hankenGrotesk(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5,
+                            color: AppColors.burgundy50,
+                          ),
                         ),
-                        right: BorderSide(
-                          color: AppColors.burgundy100,
-                          width: 0.75,
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: widget.onShopNow,
+                          child: Container(
+                            width: 118.w,
+                            height: 32.h,
+                            decoration: BoxDecoration(
+                              color: AppColors.burgundy,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border(
+                                top: BorderSide(
+                                  color: AppColors.burgundy100,
+                                  width: 0.75,
+                                ),
+                                left: BorderSide(
+                                  color: AppColors.burgundy100,
+                                  width: 0.75,
+                                ),
+                                right: BorderSide(
+                                  color: AppColors.burgundy100,
+                                  width: 0.75,
+                                ),
+                                bottom: BorderSide(
+                                  color: AppColors.burgundy100,
+                                  width: 3,
+                                ),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Shop Now',
+                              style: GoogleFonts.hankenGrotesk(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                height: 1.2,
+                                color: AppColors.burgundy50,
+                              ),
+                            ),
+                          ),
                         ),
-                        bottom: BorderSide(
-                          color: AppColors.burgundy100,
-                          width: 3,
-                        ),
-                      ),
+                      ],
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Shop Now',
-                      style: GoogleFonts.hankenGrotesk(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                        color: AppColors.burgundy50,
-                      ),
-                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
           Positioned(
             left: 0,
             right: 0,
             bottom: 7.h,
-            child: Center(
-              child: SvgPicture.asset(
-                IconPath.shopHeroDots,
-                width: 32.w,
-                height: 4.h,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_slides.length, (i) {
+                final active = i == _index;
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 1.5.w),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    width: 4.w,
+                    height: 4.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: active ? Colors.white : const Color(0xFFD2D2D2),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
         ],
@@ -449,6 +550,7 @@ class _SupportVendorsCard extends StatelessWidget {
                   onTap: onTap,
                   child: Container(
                     height: 32.h,
+                    width: 120.w,
                     padding: EdgeInsets.symmetric(horizontal: 10.w),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -500,7 +602,7 @@ class _TrustTicker extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 24.h,
+      height: 24.w,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
