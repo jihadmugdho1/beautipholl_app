@@ -44,6 +44,7 @@ import '../features/shop/presentation/screens/main_shell.dart';
 import '../features/shop/presentation/screens/product_details_screen.dart';
 import '../features/shop/presentation/screens/vendor_screen.dart';
 import '../features/profile/controllers/profile_controller.dart';
+import '../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../features/profile/presentation/screens/elite_cancel_screen.dart';
 import '../features/profile/presentation/screens/elite_join_screen.dart';
 import '../features/profile/presentation/screens/elite_membership_screen.dart';
@@ -86,6 +87,7 @@ class AppRoute {
   static const String returnDetailsScreen = '/returnDetailsScreen';
   static const String myOrdersScreen = '/myOrdersScreen';
   static const String profileAddressesScreen = '/profileAddressesScreen';
+  static const String editProfileScreen = '/editProfileScreen';
   static const String eliteJoinScreen = '/eliteJoinScreen';
   static const String eliteWelcomeScreen = '/eliteWelcomeScreen';
   static const String eliteMembershipScreen = '/eliteMembershipScreen';
@@ -285,6 +287,11 @@ class AppRoute {
     GetPage(
       name: profileAddressesScreen,
       page: () => const ProfileAddressesScreen(),
+      binding: BindingsBuilder(_ensureProfile),
+    ),
+    GetPage(
+      name: editProfileScreen,
+      page: () => const EditProfileScreen(),
       binding: BindingsBuilder(_ensureProfile),
     ),
     GetPage(
