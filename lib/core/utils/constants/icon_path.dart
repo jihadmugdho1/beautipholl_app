@@ -2,7 +2,7 @@ class IconPath {
   IconPath._();
 
   static const String arrowRightDouble = 'assets/icons/arrow_right_double.svg';
-  static const String search = 'assets/icons/auth/search.png';
+  static const String search = 'assets/icons/auth/search.svg';
   static const String checkbox = 'assets/icons/auth/checkbox.svg';
   static const String divider = 'assets/icons/auth/divider.svg';
   static const String eye = 'assets/icons/auth/eye.svg';
@@ -29,11 +29,15 @@ class IconPath {
   static const String support = 'assets/icons/auth/support.svg';
 
   static const String shopHome = 'assets/icons/shop/home.svg';
+  static const String shopHomeOutline = 'assets/icons/shop/home_outline.svg';
   static const String shopBag = 'assets/icons/shop/bag.svg';
+  static const String shopBagFilled = 'assets/icons/shop/bag_filled.svg';
   static const String shopHeartNav = 'assets/icons/shop/heart_nav.svg';
   static const String shopCart = 'assets/icons/shop/cart.svg';
   static const String shopCartNav = 'assets/icons/shop/cart_nav.svg';
+  static const String shopCartFilled = 'assets/icons/shop/cart_filled.svg';
   static const String shopProfile = 'assets/icons/shop/profile.svg';
+  static const String shopProfileFilled = 'assets/icons/shop/profile_filled.svg';
   static const String shopHeart = 'assets/icons/shop/heart.svg';
   static const String shopHeartEmpty = 'assets/icons/shop/heart_empty.svg';
   static const String shopHeartFilled = 'assets/icons/shop/heart_filled.svg';
