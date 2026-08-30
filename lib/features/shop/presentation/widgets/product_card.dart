@@ -75,14 +75,17 @@ class ProductCard extends StatelessWidget {
                           width: 0.5,
                         ),
                       ),
-                      child: Text(
-                        c.orgLetters,
-                        style: GoogleFonts.hankenGrotesk(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                          letterSpacing: -0.42,
-                          color: AppColors.gold300,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          c.orgLetters,
+                          style: GoogleFonts.hankenGrotesk(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            height: 1.0,
+                            letterSpacing: -0.42,
+                            color: AppColors.gold300,
+                          ),
                         ),
                       ),
                     ),
@@ -135,6 +138,7 @@ class ProductCard extends StatelessWidget {
                           ),
                         ),
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
@@ -216,13 +220,17 @@ class ProductCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(43.r),
                         ),
                         alignment: Alignment.center,
-                        child: Text(
-                          'Unlock With Elite',
-                          style: GoogleFonts.hankenGrotesk(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            height: 1.3,
-                            color: AppColors.gold50,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Unlock With Elite',
+                            maxLines: 1,
+                            style: GoogleFonts.hankenGrotesk(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.0,
+                              color: AppColors.gold50,
+                            ),
                           ),
                         ),
                       ),
@@ -240,44 +248,59 @@ class ProductCard extends StatelessWidget {
                             color: AppColors.maroonAccent,
                           ),
                         ),
-                        const Spacer(),
-                        if (product.badge == ProductBadge.limitedDrop) ...[
-                          SvgPicture.asset(
-                            IconPath.shopDiamond,
-                            width: 12.w,
-                            height: 12.w,
+                        SizedBox(width: 4.w),
+                        Flexible(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (product.badge == ProductBadge.limitedDrop) ...[
+                                SvgPicture.asset(
+                                  IconPath.shopDiamond,
+                                  width: 12.w,
+                                  height: 12.w,
+                                ),
+                                SizedBox(width: 3.w),
+                                Flexible(
+                                  child: Text(
+                                    'Limited Drop',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.hankenGrotesk(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.3,
+                                      color: AppColors.burgundy,
+                                    ),
+                                  ),
+                                ),
+                              ] else ...[
+                                SvgPicture.asset(
+                                  IconPath.shopTick,
+                                  width: 12.w,
+                                  height: 12.w,
+                                  colorFilter: const ColorFilter.mode(
+                                    AppColors.gold600,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                SizedBox(width: 3.w),
+                                Flexible(
+                                  child: Text(
+                                    'Licensed',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.hankenGrotesk(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.3,
+                                      color: AppColors.gold600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            'Limited Drop',
-                            style: GoogleFonts.hankenGrotesk(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              height: 1.3,
-                              color: AppColors.burgundy,
-                            ),
-                          ),
-                        ] else ...[
-                          SvgPicture.asset(
-                            IconPath.shopTick,
-                            width: 12.w,
-                            height: 12.w,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.gold600,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            'Licensed',
-                            style: GoogleFonts.hankenGrotesk(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              height: 1.3,
-                              color: AppColors.gold600,
-                            ),
-                          ),
-                        ],
+                        ),
                       ],
                     ),
                     SizedBox(height: 4.h),
