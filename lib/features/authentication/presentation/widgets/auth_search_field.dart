@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/constants/colors.dart';
@@ -27,12 +28,14 @@ class AuthSearchField extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
+          SvgPicture.asset(
             IconPath.search,
             width: 24.w,
             height: 24.w,
-            color: AppColors.burgundy100,
-            colorBlendMode: BlendMode.srcIn,
+            colorFilter: const ColorFilter.mode(
+              AppColors.burgundy100,
+              BlendMode.srcIn,
+            ),
           ),
           SizedBox(width: 8.w),
           Expanded(
