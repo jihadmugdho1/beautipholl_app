@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/services/storage_service.dart';
 import '../../../../core/utils/constants/colors.dart';
 import '../../../../core/utils/constants/icon_path.dart';
 import '../../../../core/utils/constants/image_path.dart';
@@ -92,9 +93,10 @@ class ProductDetailsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 12.h),
                           SizedBox(
-                            height: 260.h,
+                            height: 288.h,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
+                              padding: EdgeInsets.only(bottom: 4.h),
                               children: [
                                 ProductCard(product: ShopCatalog.products[0]),
                                 SizedBox(width: 8.w),
@@ -132,10 +134,11 @@ class _Gallery extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 320.h,
+          height: 340.h,
           width: double.infinity,
           child: Stack(
             fit: StackFit.expand,
+            alignment: Alignment.topCenter,
             children: [
               Obx(
                 () => Image.asset(
@@ -143,33 +146,34 @@ class _Gallery extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
-                  child: Row(
-                    children: [
-                      _RoundIcon(
-                        icon: IconPath.shopBack,
-                        onTap: Get.back,
-                      ),
-                      const Spacer(),
-                      Obx(() {
-                        final id = c.productId.value;
-                        final saved = shop.savedIds.contains(id);
-                        return _RoundIcon(
-                          icon: saved
-                              ? IconPath.shopHeartFilled
-                              : IconPath.shopHeart,
-                          onTap: () => shop.toggleSaved(id),
-                        );
-                      }),
-                      SizedBox(width: 8.w),
-                      _RoundIcon(
-                        icon: IconPath.shopShare,
-                        onTap: () => showAuthMessage('Share link copied.'),
-                      ),
-                    ],
-                  ),
+              Positioned(
+                top: 44.h,
+                left: 16.w,
+                right: 16.w,
+                child: Row(
+                  children: [
+                    _RoundIcon(
+                      icon: IconPath.shopBack,
+                      onTap: Get.back,
+                    ),
+                    const Spacer(),
+                    Obx(() {
+                      final id = c.productId.value;
+                      final saved = shop.savedIds.contains(id);
+                      return _RoundIcon(
+                        icon: saved
+                            ? IconPath.shopHeartFilled
+                            : IconPath.shopHeart,
+                        color: saved ? AppColors.maroonAccent : null,
+                        onTap: () => shop.toggleSaved(id),
+                      );
+                    }),
+                    SizedBox(width: 8.w),
+                    _RoundIcon(
+                      icon: IconPath.shopShare,
+                      onTap: () => showAuthMessage('Share link copied.'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -216,10 +220,15 @@ class _Gallery extends StatelessWidget {
 }
 
 class _RoundIcon extends StatelessWidget {
-  const _RoundIcon({required this.icon, required this.onTap});
+  const _RoundIcon({
+    required this.icon,
+    required this.onTap,
+    this.color,
+  });
 
   final String icon;
   final VoidCallback onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +242,18 @@ class _RoundIcon extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
         ),
         alignment: Alignment.center,
-        child: SvgPicture.asset(icon, width: 20.w, height: 20.w),
+        child: SizedBox(
+          width: 20.w,
+          height: 20.w,
+          child: SvgPicture.asset(
+            icon,
+            fit: BoxFit.contain,
+            colorFilter: ColorFilter.mode(
+              color ?? const Color(0xFF1E1E1E),
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -269,8 +289,8 @@ class _InfoCard extends StatelessWidget {
           GestureDetector(
             onTap: shop.openVendor,
             child: Container(
-              height: 40.h,
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              constraints: BoxConstraints(minHeight: 40.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
                 color: AppColors.burgundy50,
                 borderRadius: BorderRadius.circular(8.r),
@@ -285,37 +305,47 @@ class _InfoCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
-                    child: SvgPicture.asset(
-                      IconPath.shopStorefront,
+                    child: SizedBox(
                       width: 16.w,
                       height: 16.w,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
+                      child: SvgPicture.asset(
+                        IconPath.shopStorefront,
+                        fit: BoxFit.contain,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(width: 8.w),
-                  Text(
-                    'The Fabric Haven',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      height: 1.5,
-                      letterSpacing: -0.28,
-                      decoration: TextDecoration.underline,
-                      color: AppColors.maroonAccent,
+                  Expanded(
+                    child: Text(
+                      'The Fabric Haven',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                        letterSpacing: -0.28,
+                        decoration: TextDecoration.underline,
+                        color: AppColors.maroonAccent,
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  SvgPicture.asset(
-                    IconPath.shopStarRate,
+                  SizedBox(width: 8.w),
+                  SizedBox(
                     width: 16.w,
                     height: 16.w,
+                    child: SvgPicture.asset(
+                      IconPath.shopStarRate,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    '4.2 ',
+                    '4.2',
                     style: GoogleFonts.hankenGrotesk(
                       fontSize: 12.sp,
                       height: 1.4,
@@ -331,10 +361,13 @@ class _InfoCard extends StatelessWidget {
             onTap: shop.openContactVendor,
             child: Row(
               children: [
-                SvgPicture.asset(
-                  IconPath.shopMessage,
+                SizedBox(
                   width: 24.w,
                   height: 24.w,
+                  child: SvgPicture.asset(
+                    IconPath.shopMessage,
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 SizedBox(width: 8.w),
                 Text(
@@ -358,15 +391,13 @@ class _InfoCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  height: 24.h,
-                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
                     color: AppColors.textBody,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  alignment: Alignment.center,
                   child: Text(
-                    'ΑΦΑ',
+                    shop.orgLetters,
                     style: GoogleFonts.hankenGrotesk(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -377,14 +408,18 @@ class _InfoCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                Text(
-                  'Alpha Phi Alpha',
-                  style: GoogleFonts.hankenGrotesk(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                    letterSpacing: -0.36,
-                    color: AppColors.black300,
+                Flexible(
+                  child: Text(
+                    StorageService.organizationName ?? 'Alpha Phi Alpha',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.hankenGrotesk(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      letterSpacing: -0.36,
+                      color: AppColors.black300,
+                    ),
                   ),
                 ),
               ],
@@ -393,29 +428,37 @@ class _InfoCard extends StatelessWidget {
           SizedBox(height: 12.h),
           Row(
             children: [
-              Text(
-                '\$58.00',
-                style: GoogleFonts.marcellus(
-                  fontSize: 32.sp,
-                  height: 1.2,
-                  color: AppColors.maroonAccent,
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        '\$58.00',
+                        style: GoogleFonts.marcellus(
+                          fontSize: 32.sp,
+                          height: 1.2,
+                          color: AppColors.maroonAccent,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        '\$70.00',
+                        style: GoogleFonts.hankenGrotesk(
+                          fontSize: 16.sp,
+                          height: 1.6,
+                          decoration: TextDecoration.lineThrough,
+                          color: AppColors.black300,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(width: 12.w),
-              Text(
-                '\$70.00',
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 16.sp,
-                  height: 1.6,
-                  decoration: TextDecoration.lineThrough,
-                  color: AppColors.black300,
-                ),
-              ),
-              const Spacer(),
+              SizedBox(width: 8.w),
               Container(
-                width: 64.w,
-                height: 19.h,
-                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                 decoration: BoxDecoration(
                   color: AppColors.successGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6.r),
@@ -424,7 +467,7 @@ class _InfoCard extends StatelessWidget {
                   'Save 18%',
                   style: GoogleFonts.hankenGrotesk(
                     fontSize: 12.sp,
-                    height: 1.4,
+                    height: 1.2,
                     color: AppColors.successGreen,
                   ),
                 ),
@@ -436,26 +479,32 @@ class _InfoCard extends StatelessWidget {
             return Row(
               children: [
                 if (controller.isElite.value) ...[
-                  SvgPicture.asset(
-                    IconPath.shopTick,
+                  SizedBox(
                     width: 14.w,
                     height: 14.w,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.gold600,
-                      BlendMode.srcIn,
+                    child: SvgPicture.asset(
+                      IconPath.shopTick,
+                      fit: BoxFit.contain,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.gold600,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                   SizedBox(width: 4.w),
                 ],
-                Text(
-                  'Member price: \$50.00',
-                  style: GoogleFonts.hankenGrotesk(
-                    fontSize: 14.sp,
-                    height: 1.5,
-                    color: AppColors.black400,
+                Expanded(
+                  child: Text(
+                    'Member price: \$50.00',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.hankenGrotesk(
+                      fontSize: 14.sp,
+                      height: 1.5,
+                      color: AppColors.black400,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 if (!controller.isElite.value)
                   GestureDetector(
                     onTap: () => Get.toNamed(AppRoute.eliteJoinScreen),
@@ -516,11 +565,28 @@ class _OptionsCard extends StatelessWidget {
                     child: Container(
                       width: 24.w,
                       height: 24.w,
-                      decoration: BoxDecoration(
-                        color: Color(ProductController.colors[i].value),
-                        shape: BoxShape.circle,
-                        border: selected
-                            ? Border.all(color: AppColors.burgundy, width: 2)
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: selected ? 24.w : 20.w,
+                        height: selected ? 24.w : 20.w,
+                        decoration: BoxDecoration(
+                          color: Color(ProductController.colors[i].value),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: selected
+                            ? SizedBox(
+                                width: 10.w,
+                                height: 10.w,
+                                child: SvgPicture.asset(
+                                  IconPath.shopTick,
+                                  fit: BoxFit.contain,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              )
                             : null,
                       ),
                     ),
@@ -529,7 +595,10 @@ class _OptionsCard extends StatelessWidget {
               }),
             );
           }),
-          SizedBox(height: 12.h),
+          Padding(
+            padding: EdgeInsets.only(top: 12.h, bottom: 12.h),
+            child: const Divider(height: 1, color: AppColors.black50),
+          ),
           Text(
             'Select Size:',
             style: GoogleFonts.hankenGrotesk(
@@ -548,22 +617,28 @@ class _OptionsCard extends StatelessWidget {
                 return GestureDetector(
                   onTap: () => controller.selectSize(size),
                   child: Container(
-                    width: 48.w,
-                    height: 32.h,
+                    constraints: BoxConstraints(minWidth: 48.w, minHeight: 36.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: selected
                           ? AppColors.maroonAccent
                           : AppColors.offWhite,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: selected
-                          ? null
-                          : Border.all(color: AppColors.black50),
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(
+                        color: selected
+                            ? AppColors.maroonAccent
+                            : AppColors.black50,
+                      ),
                     ),
                     child: Text(
                       size,
                       style: GoogleFonts.hankenGrotesk(
                         fontSize: 14.sp,
+                        height: 1.3,
                         fontWeight:
                             selected ? FontWeight.w600 : FontWeight.w400,
                         color: selected
@@ -576,55 +651,84 @@ class _OptionsCard extends StatelessWidget {
               }).toList(),
             );
           }),
-          SizedBox(height: 12.h),
-          Text(
-            'Quantity:',
-            style: GoogleFonts.hankenGrotesk(
-              fontSize: 14.sp,
-              height: 1.5,
-              color: AppColors.textBody,
-            ),
+          Padding(
+            padding: EdgeInsets.only(top: 12.h, bottom: 12.h),
+            child: const Divider(height: 1, color: AppColors.black50),
           ),
-          SizedBox(height: 8.h),
-          Container(
-            height: 40.h,
-            width: 120.w,
-            decoration: BoxDecoration(
-              color: AppColors.offWhite,
-              borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(color: AppColors.black50),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: controller.decrementQty,
-                  child: SvgPicture.asset(
-                    IconPath.shopMinus,
-                    width: 16.w,
-                    height: 16.w,
-                  ),
+          Row(
+            children: [
+              Text(
+                'Quantity:',
+                style: GoogleFonts.hankenGrotesk(
+                  fontSize: 14.sp,
+                  height: 1.5,
+                  color: AppColors.textBody,
                 ),
-                Obx(
-                  () => Text(
-                    '${controller.quantity.value}',
-                    style: GoogleFonts.hankenGrotesk(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textBody,
+              ),
+              const Spacer(),
+              Container(
+                width: 159.w,
+                height: 42.h,
+                padding: EdgeInsets.symmetric(horizontal: 9.w),
+                decoration: BoxDecoration(
+                  color: AppColors.offWhite400,
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(color: AppColors.black100),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: controller.decrementQty,
+                      behavior: HitTestBehavior.opaque,
+                      child: SizedBox(
+                        width: 32.w,
+                        height: 32.w,
+                        child: Center(
+                          child: SizedBox(
+                            width: 14.w,
+                            height: 14.w,
+                            child: SvgPicture.asset(
+                              IconPath.shopMinus,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Obx(
+                      () => Text(
+                        '${controller.quantity.value}',
+                        style: GoogleFonts.hankenGrotesk(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                          color: AppColors.textBody,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: controller.incrementQty,
+                      behavior: HitTestBehavior.opaque,
+                      child: SizedBox(
+                        width: 32.w,
+                        height: 32.w,
+                        child: Center(
+                          child: SizedBox(
+                            width: 14.w,
+                            height: 14.w,
+                            child: SvgPicture.asset(
+                              IconPath.shopPlus,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                GestureDetector(
-                  onTap: controller.incrementQty,
-                  child: SvgPicture.asset(
-                    IconPath.shopPlus,
-                    width: 16.w,
-                    height: 16.w,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -643,15 +747,24 @@ class _ConditionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(IconPath.shopShirt, width: 14.w, height: 14.w),
+              SizedBox(
+                width: 14.w,
+                height: 14.w,
+                child: SvgPicture.asset(
+                  IconPath.shopShirt,
+                  fit: BoxFit.contain,
+                ),
+              ),
               SizedBox(width: 8.w),
-              Text(
-                'Condition & Production',
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                  height: 1.3,
-                  color: AppColors.textBody,
+              Expanded(
+                child: Text(
+                  'Condition & Production',
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                    color: AppColors.textBody,
+                  ),
                 ),
               ),
             ],
@@ -688,14 +801,19 @@ class _ConditionCard extends StatelessWidget {
             color: AppColors.black300,
           ),
         ),
-        const Spacer(),
-        Text(
-          v,
-          style: GoogleFonts.hankenGrotesk(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            height: 1.5,
-            color: AppColors.textBody,
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Text(
+            v,
+            textAlign: TextAlign.right,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.hankenGrotesk(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+              color: AppColors.textBody,
+            ),
           ),
         ),
       ],
@@ -718,21 +836,37 @@ class _SizeGuideCard extends StatelessWidget {
             onTap: controller.toggleSizeGuide,
             child: Row(
               children: [
-                SvgPicture.asset(IconPath.shopRuler, width: 14.w, height: 14.w),
-                SizedBox(width: 8.w),
-                Text(
-                  'Size Guide',
-                  style: GoogleFonts.hankenGrotesk(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textBody,
+                SizedBox(
+                  width: 14.w,
+                  height: 14.w,
+                  child: SvgPicture.asset(
+                    IconPath.shopRuler,
+                    fit: BoxFit.contain,
                   ),
                 ),
-                const Spacer(),
-                SvgPicture.asset(
-                  IconPath.shopChevronUp,
-                  width: 16.w,
-                  height: 16.w,
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'Size Guide',
+                    style: GoogleFonts.hankenGrotesk(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textBody,
+                    ),
+                  ),
+                ),
+                Obx(
+                  () => Transform.rotate(
+                    angle: controller.sizeGuideOpen.value ? 0 : 3.14159,
+                    child: SizedBox(
+                      width: 16.w,
+                      height: 16.w,
+                      child: SvgPicture.asset(
+                        IconPath.shopChevronUp,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -794,6 +928,8 @@ class _SizeGuideCard extends StatelessWidget {
           return Expanded(
             child: Text(
               cells[i],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: GoogleFonts.hankenGrotesk(
                 fontSize: header ? 12.sp : 13.sp,
                 fontWeight: header || (highlight && i == 0)
@@ -843,7 +979,11 @@ class _TimeCard extends StatelessWidget {
               border: gold ? null : Border.all(color: AppColors.black50),
             ),
             alignment: Alignment.center,
-            child: SvgPicture.asset(icon, width: 16.w, height: 16.w),
+            child: SizedBox(
+              width: 16.w,
+              height: 16.w,
+              child: SvgPicture.asset(icon, fit: BoxFit.contain),
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -903,14 +1043,23 @@ class _CustomizationCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(IconPath.shopCustom, width: 14.w, height: 14.w),
+              SizedBox(
+                width: 14.w,
+                height: 14.w,
+                child: SvgPicture.asset(
+                  IconPath.shopCustom,
+                  fit: BoxFit.contain,
+                ),
+              ),
               SizedBox(width: 8.w),
-              Text(
-                'Customization Options',
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textBody,
+              Expanded(
+                child: Text(
+                  'Customization Options',
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textBody,
+                  ),
                 ),
               ),
             ],
@@ -988,14 +1137,25 @@ class _FaqCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(IconPath.shopFaq, width: 14.w, height: 14.w),
+              SizedBox(
+                width: 14.w,
+                height: 14.w,
+                child: SvgPicture.asset(
+                  IconPath.shopFaq,
+                  fit: BoxFit.contain,
+                ),
+              ),
               SizedBox(width: 8.w),
-              Text(
-                'Frequently Asked Questions',
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textBody,
+              Expanded(
+                child: Text(
+                  'Frequently Asked Questions',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textBody,
+                  ),
                 ),
               ),
             ],
@@ -1010,23 +1170,39 @@ class _FaqCard extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                      title: Text(
-                        ProductController.faqs[i].$1,
-                        style: GoogleFonts.hankenGrotesk(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textBody,
+                    GestureDetector(
+                      onTap: () => controller.toggleFaq(i),
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                ProductController.faqs[i].$1,
+                                style: GoogleFonts.hankenGrotesk(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.4,
+                                  color: AppColors.textBody,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Transform.rotate(
+                              angle: open ? 3.14159 : 0,
+                              child: SizedBox(
+                                width: 15.w,
+                                height: 15.w,
+                                child: SvgPicture.asset(
+                                  IconPath.shopFaqChevron,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      trailing: SvgPicture.asset(
-                        IconPath.shopFaqChevron,
-                        width: 15.w,
-                        height: 15.w,
-                      ),
-                      onTap: () => controller.toggleFaq(i),
                     ),
                     if (open)
                       Padding(
@@ -1114,16 +1290,23 @@ class _DescriptionCard extends StatelessWidget {
 
   Widget _bullet(String text) {
     return Padding(
-      padding: const EdgeInsets.only(left: 12, top: 2),
+      padding: EdgeInsets.only(left: 12.w, top: 2.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('•  '),
+          Text(
+            '•  ',
+            style: GoogleFonts.hankenGrotesk(
+              fontSize: 14.sp,
+              height: 1.5,
+              color: AppColors.black400,
+            ),
+          ),
           Expanded(
             child: Text(
               text,
               style: GoogleFonts.hankenGrotesk(
-                fontSize: 14,
+                fontSize: 14.sp,
                 height: 1.5,
                 color: AppColors.black400,
               ),
@@ -1152,32 +1335,37 @@ class _ShippingReturnsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                IconPath.shopShipFrom,
+              SizedBox(
                 width: 22.w,
-                height: 16.h,
+                height: 22.w,
+                child: SvgPicture.asset(
+                  IconPath.shopShipFrom,
+                  fit: BoxFit.contain,
+                ),
               ),
               SizedBox(width: 12.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ships from Atlanta, GA',
-                    style: GoogleFonts.hankenGrotesk(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.7,
-                      color: const Color(0xFFE4E2DD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ships from Atlanta, GA',
+                      style: GoogleFonts.hankenGrotesk(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.7,
+                        color: const Color(0xFFE4E2DD),
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Standard \$5.99 • Free over \$150',
-                    style: GoogleFonts.hankenGrotesk(
-                      fontSize: 12.sp,
-                      color: const Color(0xFFD3C3C3),
+                    Text(
+                      'Standard \$5.99 • Free over \$150',
+                      style: GoogleFonts.hankenGrotesk(
+                        fontSize: 12.sp,
+                        color: const Color(0xFFD3C3C3),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -1187,32 +1375,37 @@ class _ShippingReturnsCard extends StatelessWidget {
           ),
           Row(
             children: [
-              SvgPicture.asset(
-                IconPath.shopReturns,
-                width: 18.w,
-                height: 20.h,
+              SizedBox(
+                width: 22.w,
+                height: 22.w,
+                child: SvgPicture.asset(
+                  IconPath.shopReturns,
+                  fit: BoxFit.contain,
+                ),
               ),
               SizedBox(width: 12.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Free returns within 30 days',
-                    style: GoogleFonts.hankenGrotesk(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.7,
-                      color: const Color(0xFFE4E2DD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Free returns within 30 days',
+                      style: GoogleFonts.hankenGrotesk(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.7,
+                        color: const Color(0xFFE4E2DD),
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Hassle-free legacy exchanges',
-                    style: GoogleFonts.hankenGrotesk(
-                      fontSize: 12.sp,
-                      color: const Color(0xFFD3C3C3),
+                    Text(
+                      'Hassle-free legacy exchanges',
+                      style: GoogleFonts.hankenGrotesk(
+                        fontSize: 12.sp,
+                        color: const Color(0xFFD3C3C3),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -1246,48 +1439,60 @@ class _ReviewsCard extends StatelessWidget {
                   color: AppColors.textBody,
                 ),
               ),
-              SizedBox(width: 18.w),
-              Container(
-                height: 27.h,
-                padding: EdgeInsets.symmetric(horizontal: 8.w),
-                decoration: BoxDecoration(
-                  color: AppColors.gold50,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: AppColors.gold200),
-                ),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      IconPath.shopStar,
-                      width: 12.w,
-                      height: 12.w,
+              SizedBox(width: 8.w),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
                     ),
-                    SizedBox(width: 4.w),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '4.8',
-                            style: GoogleFonts.hankenGrotesk(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.gold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' (292)',
-                            style: GoogleFonts.hankenGrotesk(
-                              fontSize: 12.sp,
-                              color: AppColors.black300,
-                            ),
-                          ),
-                        ],
-                      ),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold50,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: AppColors.gold200),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 12.w,
+                          height: 12.w,
+                          child: SvgPicture.asset(
+                            IconPath.shopStar,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '4.8',
+                                style: GoogleFonts.hankenGrotesk(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.gold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' (292)',
+                                style: GoogleFonts.hankenGrotesk(
+                                  fontSize: 12.sp,
+                                  color: AppColors.black300,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              const Spacer(),
+              SizedBox(width: 8.w),
               Text(
                 'View All',
                 style: GoogleFonts.hankenGrotesk(
@@ -1301,7 +1506,7 @@ class _ReviewsCard extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           SizedBox(
-            height: 180.h,
+            height: 200.h,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: const [
@@ -1334,19 +1539,27 @@ class _ReviewTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                'Samantha D.',
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textBody,
+              Expanded(
+                child: Text(
+                  'Samantha D.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBody,
+                  ),
                 ),
               ),
-              const Spacer(),
-              SvgPicture.asset(
-                IconPath.shopReviewStars,
+              SizedBox(width: 8.w),
+              SizedBox(
                 width: 98.w,
                 height: 16.h,
+                child: SvgPicture.asset(
+                  IconPath.shopReviewStars,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.centerRight,
+                ),
               ),
             ],
           ),
@@ -1384,7 +1597,10 @@ class _AddToCartBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.black50)),
+      ),
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
       child: SafeArea(
         top: false,
@@ -1392,6 +1608,7 @@ class _AddToCartBar extends StatelessWidget {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'Total',
@@ -1411,39 +1628,54 @@ class _AddToCartBar extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(),
-            GestureDetector(
-              onTap: onAdd,
-              child: Container(
-                width: 197.w,
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: AppColors.gold,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      IconPath.shopCartNav,
-                      width: 24.w,
-                      height: 24.w,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.burgundy,
-                        BlendMode.srcIn,
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 197.w),
+                  child: GestureDetector(
+                    onTap: onAdd,
+                    child: Container(
+                      width: double.infinity,
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.gold,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: SvgPicture.asset(
+                              IconPath.shopCart,
+                              fit: BoxFit.contain,
+                              colorFilter: const ColorFilter.mode(
+                                AppColors.burgundy,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              'Add To Cart',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.hankenGrotesk(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                color: AppColors.burgundy,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      'Add To Cart',
-                      style: GoogleFonts.hankenGrotesk(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: AppColors.burgundy,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
