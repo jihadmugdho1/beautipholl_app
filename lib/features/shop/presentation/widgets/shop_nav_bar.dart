@@ -36,13 +36,17 @@ class ShopNavBar extends StatelessWidget {
             return Row(
               children: [
                 _NavItem(
-                  icon: IconPath.shopHome,
+                  icon: selected == 0
+                      ? IconPath.shopHome
+                      : IconPath.shopHomeOutline,
                   label: 'Home',
                   selected: selected == 0,
                   onTap: () => c.selectTab(0),
                 ),
                 _NavItem(
-                  icon: IconPath.shopBag,
+                  icon: selected == 1
+                      ? IconPath.shopBagFilled
+                      : IconPath.shopBag,
                   label: 'Shop',
                   selected: selected == 1,
                   onTap: () => c.selectTab(1),
@@ -56,13 +60,17 @@ class ShopNavBar extends StatelessWidget {
                   onTap: () => c.selectTab(2),
                 ),
                 _NavItem(
-                  icon: IconPath.shopCartNav,
+                  icon: selected == 3
+                      ? IconPath.shopCartFilled
+                      : IconPath.shopCartNav,
                   label: 'Cart',
                   selected: selected == 3,
                   onTap: () => c.selectTab(3),
                 ),
                 _NavItem(
-                  icon: IconPath.shopProfile,
+                  icon: selected == 4
+                      ? IconPath.shopProfileFilled
+                      : IconPath.shopProfile,
                   label: 'Profile',
                   selected: selected == 4,
                   onTap: () => c.selectTab(4),
@@ -113,6 +121,7 @@ class _NavItem extends StatelessWidget {
                   icon,
                   width: 24.w,
                   height: 24.w,
+                  fit: BoxFit.contain,
                   colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
                 ),
               ),

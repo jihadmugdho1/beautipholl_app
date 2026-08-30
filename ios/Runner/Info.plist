@@ -28,6 +28,12 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enable Face ID for faster, secure access to your account.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow Beautipholl to access your photos so you can update your profile picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow Beautipholl to use the camera so you can take a profile photo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow Beautipholl to save photos you choose for your profile.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
