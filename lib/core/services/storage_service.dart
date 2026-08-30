@@ -21,6 +21,9 @@ class StorageService {
   static const String _eliteAnnualKey = 'eliteAnnual';
   static const String _addressesKey = 'savedAddressesJson';
   static const String _selectedAddressKey = 'selectedAddressIndex';
+  static const String _profileNameKey = 'profileName';
+  static const String _profilePhoneKey = 'profilePhone';
+  static const String _profilePhotoKey = 'profilePhotoPath';
 
   static SharedPreferences? _preferences;
 
@@ -169,5 +172,30 @@ class StorageService {
   }) async {
     await _preferences?.setString(_addressesKey, jsonEncode(addresses));
     await _preferences?.setInt(_selectedAddressKey, selectedIndex);
+  }
+
+  static String get profileName =>
+      _preferences?.getString(_profileNameKey) ?? 'Marcus Johnson';
+
+  static Future<void> setProfileName(String name) async {
+    await _preferences?.setString(_profileNameKey, name);
+  }
+
+  static String get profilePhone =>
+      _preferences?.getString(_profilePhoneKey) ?? '';
+
+  static Future<void> setProfilePhone(String phone) async {
+    await _preferences?.setString(_profilePhoneKey, phone);
+  }
+
+  static String get profilePhotoPath =>
+      _preferences?.getString(_profilePhotoKey) ?? '';
+
+  static Future<void> setProfilePhotoPath(String path) async {
+    if (path.isEmpty) {
+      await _preferences?.remove(_profilePhotoKey);
+    } else {
+      await _preferences?.setString(_profilePhotoKey, path);
+    }
   }
 }

@@ -109,12 +109,14 @@ class _TopicSearch extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
+          SvgPicture.asset(
             IconPath.search,
             width: 24.w,
             height: 24.w,
-            color: AppColors.black400,
-            colorBlendMode: BlendMode.srcIn,
+            colorFilter: const ColorFilter.mode(
+              AppColors.black400,
+              BlendMode.srcIn,
+            ),
           ),
           SizedBox(width: 8.w),
           Expanded(
