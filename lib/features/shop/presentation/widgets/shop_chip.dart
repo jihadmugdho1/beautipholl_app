@@ -35,13 +35,17 @@ class ShopChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
           border: selected ? null : Border.all(color: AppColors.black50),
         ),
-        child: Text(
-          label,
-          style: GoogleFonts.hankenGrotesk(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w400,
-            height: 1.6,
-            color: selected ? AppColors.maroon50 : AppColors.black400,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            maxLines: 1,
+            style: GoogleFonts.hankenGrotesk(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w400,
+              height: 1.2,
+              color: selected ? AppColors.maroon50 : AppColors.black400,
+            ),
           ),
         ),
       ),
