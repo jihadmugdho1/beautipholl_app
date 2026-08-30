@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/services/storage_service.dart';
+import '../../../core/utils/constants/colors.dart';
 import '../../../core/utils/constants/icon_path.dart';
 import '../../../features/authentication/presentation/widgets/auth_input.dart';
 import '../../../features/shop/controllers/shop_controller.dart';
@@ -37,6 +43,14 @@ class ProfileController extends GetxController {
   final city = TextEditingController();
   final state = TextEditingController();
   final zip = TextEditingController();
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+
+  final profileName = 'Marcus Johnson'.obs;
+  final profileEmail = 'marcus@omegapsi.org'.obs;
+  final profilePhone = ''.obs;
+  final profilePhotoPath = ''.obs;
 
   static const perks = [
     ElitePerk(
@@ -265,13 +279,9 @@ class ProfileController extends GetxController {
     'Account & Login',
   ];
 
-  String get displayName => 'Marcus Johnson';
+  String get displayName => profileName.value;
 
-  String get email {
-    final remembered = StorageService.rememberedEmail;
-    if (remembered != null && remembered.contains('@')) return remembered;
-    return 'marcus@omegapsi.org';
-  }
+  String get email => profileEmail.value;
 
   String get memberBadge {
     final letters = OrganizationLetters.fromName(
@@ -316,6 +326,14 @@ class ProfileController extends GetxController {
     super.onInit();
     isElite.value = StorageService.isElite;
     annualSelected.value = StorageService.eliteAnnual;
+    profileName.value = StorageService.profileName;
+    final remembered = StorageService.rememberedEmail;
+    profileEmail.value =
+        (remembered != null && remembered.contains('@'))
+            ? remembered
+            : 'marcus@omegapsi.org';
+    profilePhone.value = StorageService.profilePhone;
+    profilePhotoPath.value = StorageService.profilePhotoPath;
     ticketSubject.addListener(_syncTicket);
     ticketMessage.addListener(_syncTicket);
     _loadAddresses();
@@ -373,6 +391,122 @@ class ProfileController extends GetxController {
   }
 
   void openAddresses() => Get.toNamed(AppRoute.profileAddressesScreen);
+
+  void openEditProfile() {
+    nameController.text = profileName.value;
+    emailController.text = profileEmail.value;
+    phoneController.text = profilePhone.value;
+    Get.toNamed(AppRoute.editProfileScreen);
+  }
+
+  void showPhotoPicker() {
+    Get.bottomSheet(
+      SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_library_outlined,
+                  color: AppColors.maroonAccent,
+                ),
+                title: Text(
+                  'Choose from gallery',
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textBody,
+                  ),
+                ),
+                onTap: () {
+                  Get.back();
+                  pickProfilePhoto(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: AppColors.maroonAccent,
+                ),
+                title: Text(
+                  'Take a photo',
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textBody,
+                  ),
+                ),
+                onTap: () {
+                  Get.back();
+                  pickProfilePhoto(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  Future<void> pickProfilePhoto(ImageSource source) async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1200,
+      );
+      if (picked == null) return;
+
+      final dir = await getApplicationDocumentsDirectory();
+      final dest = File(
+        '${dir.path}/profile_avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
+      await File(picked.path).copy(dest.path);
+
+      final previous = profilePhotoPath.value;
+      if (previous.isNotEmpty) {
+        final oldFile = File(previous);
+        if (oldFile.existsSync()) {
+          await oldFile.delete();
+        }
+        await FileImage(oldFile).evict();
+      }
+
+      profilePhotoPath.value = dest.path;
+      await StorageService.setProfilePhotoPath(dest.path);
+    } catch (_) {
+      showAuthMessage('Could not update photo. Please try again.');
+    }
+  }
+
+  void saveProfile() {
+    final name = nameController.text.trim();
+    final mail = emailController.text.trim();
+    final phone = phoneController.text.trim();
+    if (name.isEmpty) {
+      showAuthMessage('Please enter your full name');
+      return;
+    }
+    if (!mail.contains('@')) {
+      showAuthMessage('Please enter a valid email');
+      return;
+    }
+    profileName.value = name;
+    profileEmail.value = mail;
+    profilePhone.value = phone;
+    StorageService.setProfileName(name);
+    StorageService.setRememberedEmail(mail);
+    StorageService.setProfilePhone(phone);
+    Get.back();
+    showAuthMessage('Profile updated');
+  }
 
   void openNotifications() => Get.toNamed(
     AppRoute.notificationScreen,
@@ -466,8 +600,17 @@ class ProfileController extends GetxController {
     ticketRegarding.value = '';
   }
 
-  void attachTicketFile() {
-    showAuthMessage('Photo picker is not connected yet');
+  Future<void> attachTicketFile() async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      if (picked == null) return;
+      ticketFiles.add(picked.name);
+    } catch (_) {
+      showAuthMessage('Could not attach photo. Please try again.');
+    }
   }
 
   void submitTicket() {
@@ -559,6 +702,9 @@ class ProfileController extends GetxController {
     city.dispose();
     state.dispose();
     zip.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
     streetFocus.dispose();
     mapTransform.dispose();
     super.onClose();

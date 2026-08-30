@@ -11,6 +11,7 @@ import '../../../../features/authentication/presentation/widgets/auth_input.dart
 import '../../../../features/shop/controllers/shop_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../widgets/profile_app_bar.dart';
+import '../widgets/profile_avatar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -27,10 +28,20 @@ class ProfileScreen extends StatelessWidget {
             title: 'Profile',
             centerTitle: true,
             onBack: () => Get.find<ShopController>().selectTab(0),
-            trailing: SvgPicture.asset(
-              IconPath.profileEdit,
-              width: 20.w,
-              height: 20.w,
+            trailing: GestureDetector(
+              onTap: c.openEditProfile,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 24.w,
+                height: 24.w,
+                child: Center(
+                  child: SvgPicture.asset(
+                    IconPath.profileEdit,
+                    width: 20.w,
+                    height: 20.w,
+                  ),
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -143,66 +154,59 @@ class _Identity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 68.w,
-          height: 68.w,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.burgundy50, width: 3),
-            image: const DecorationImage(
-              image: AssetImage(ImagePath.profileAvatar),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        ProfileAvatarView(size: 68.w),
         SizedBox(width: 16.w),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                controller.displayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  color: AppColors.textBody,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                controller.email,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.hankenGrotesk(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                  height: 1.5,
-                  color: AppColors.black400,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  color: AppColors.gold50,
-                  borderRadius: BorderRadius.circular(100.r),
-                  border: Border.all(color: AppColors.gold200),
-                ),
-                child: Text(
-                  controller.memberBadge,
+          child: Obx(() {
+            final name = controller.profileName.value;
+            final email = controller.profileEmail.value;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.hankenGrotesk(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
-                    height: 1.5,
-                    color: AppColors.goldDeep,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    color: AppColors.textBody,
                   ),
                 ),
-              ),
-            ],
-          ),
+                SizedBox(height: 2.h),
+                Text(
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.hankenGrotesk(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    color: AppColors.black400,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.gold50,
+                    borderRadius: BorderRadius.circular(100.r),
+                    border: Border.all(color: AppColors.gold200),
+                  ),
+                  child: Text(
+                    controller.memberBadge,
+                    style: GoogleFonts.hankenGrotesk(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                      height: 1.5,
+                      color: AppColors.goldDeep,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
         ),
       ],
     );
